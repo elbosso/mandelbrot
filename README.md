@@ -13,6 +13,10 @@
 [![Github All Releases](https://img.shields.io/github/downloads/elbosso/mandelbrot/total.svg)](https://github.com/elbosso/qbrowser)
 [![Website elbosso.github.io](https://img.shields.io/website-up-down-green-red/https/elbosso.github.io.svg)](https://elbosso.github.io/)
 
+## Preconditions
+
+Java 11
+
 ## Build
 mvn -U package assembly:single
 

@@ -140,6 +140,7 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	private void createActions()
 	{
 		resetAction=new de.netsysit.util.pattern.command.ResetAction(this);
+		resetAction.putValue(Action.SHORT_DESCRIPTION,"Reset");
 		startStopActionPair=new de.elbosso.util.pattern.command.StartStopActionPair(anim);
 		de.netsysit.util.pattern.command.FileProcessor exportImgClient =
 				new de.netsysit.util.pattern.command.FileProcessor()
@@ -158,12 +159,16 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		{
 			img = new de.netsysit.util.pattern.command.ChooseFileAction(exportImgClient, /*i18n.getString("ImageViewer.*/"snapshotPngAction"/*.text")*/, null);
 		}
+		startStopActionPair.getStopAction().putValue(Action.SHORT_DESCRIPTION,"Stop animation");
+		startStopActionPair.getStartAction().putValue(Action.SHORT_DESCRIPTION,"Start animation");
+
 //					de.netsysit.db.ui.Utilities.configureOpenFileChooser(img.getFilechooser());
 		img.setAllowedSuffixes(EXPORTSUFFIXES);
 		img.setSaveDialog(true);
 		img.setDefaultFileEnding(".png");
 //		img.putValue(javax.swing.Action.SHORT_DESCRIPTION, i18n.getString("ImageViewer.snapshotPngAction.tooltip"));
 		snapshotPngAction = img;
+		snapshotPngAction.putValue(Action.SHORT_DESCRIPTION,"Screenshot (as PNG)");
 	}
 	private void setRenderPanel(MandelbrotRender newRendere){
 		assert(newRendere!=null);

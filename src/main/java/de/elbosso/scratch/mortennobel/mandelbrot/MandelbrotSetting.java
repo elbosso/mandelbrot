@@ -1,41 +1,56 @@
 package de.elbosso.scratch.mortennobel.mandelbrot;
 
 public class MandelbrotSetting {
-	private float x = -2;
-	private float y = -2;
-	private float height = 4;
-	private float width = 4;
+	private double x = 0.42483058528569073;//0.302857;//-2;
+	private double y = -0.2134979507302626;//-0.451429;//-2;
+	private double height = 0.3;//4;
+	private double width = 0.3;//4;
 	private int iterations = 128;
 
-	public float getX() {
+	public double getX() {
 		return x;
 	}
+	public float getXAsFloat() {
+		return (float)x;
+	}
 
-	public void setX(float x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 
-	public float getY() {
+	public double getY() {
 		return y;
 	}
 
-	public void setY(float y) {
+	public float getYAsFloat() {
+		return (float)y;
+	}
+
+	public void setY(double y) {
 		this.y = y;
 	}
 
-	public float getHeight() {
+	public double getHeight() {
 		return height;
 	}
 
-	public void setHeight(float height) {
+	public float getHeightAsFloat() {
+		return (float)height;
+	}
+
+	public void setHeight(double height) {
 		this.height = height;
 	}
 
-	public float getWidth() {
+	public double getWidth() {
 		return width;
 	}
 
-	public void setWidth(float width) {
+	public float getWidthAsFloat() {
+		return (float)width;
+	}
+
+	public void setWidth(double width) {
 		this.width = width;
 	}
 

@@ -185,7 +185,7 @@ public class MandelbrotAnimation extends de.elbosso.util.beans.EventHandlingSupp
 		}
 		else
 		{
-			setting.setHeight(smallestsize);
+			setting.setHeight (smallestsize);
 			setting.setWidth(smallestsize*fac);
 		}
 		setting.setX(centerX-setting.getWidth()*0.5f);

@@ -40,9 +40,9 @@ public class MandelbrotJava2D extends JComponent implements MandelbrotRender {
 		dataBuffer = (DataBufferInt) imageRaster.getDataBuffer();
 	}
 
-	private int calculateMandelbrotIterations(float x, float y) {
-		float xx = 0.0f;
-		float yy = 0.0f;
+	private int calculateMandelbrotIterations(double x, double y) {
+		double xx = 0.0f;
+		double yy = 0.0f;
 		int iter = 0;
 //      Original
 //		while (xx * xx + yy * yy <= 4.0f && iter<settingsCopy.getIterations()) {
@@ -55,10 +55,10 @@ public class MandelbrotJava2D extends JComponent implements MandelbrotRender {
 //		}
 
         // optimized - caching xx*xx and yy*yy
-        float xxXxCache;
-        float yyYyCache;
+		double xxXxCache;
+		double yyYyCache;
         while ((xxXxCache=xx * xx) + (yyYyCache=yy * yy) <= 4.0f && iter<settingsCopy.getIterations()) {
-			float temp = xxXxCache - yyYyCache + x;
+			double temp = xxXxCache - yyYyCache + x;
 			yy = 2.0f*xx*yy + y;
 
 			xx = temp;
@@ -108,13 +108,13 @@ public class MandelbrotJava2D extends JComponent implements MandelbrotRender {
 		stat.timerStart();
         settings.copyTo(settingsCopy);
         buildPrecomputedColors();
-		float deltaX = settingsCopy.getWidth()/image.getWidth();
-		float deltaY = settingsCopy.getHeight()/image.getHeight();
+		double deltaX = settingsCopy.getWidth()/image.getWidth();
+		double deltaY = settingsCopy.getHeight()/image.getHeight();
 		int index = 0;
 		int[] data = dataBuffer.getData();
-		float y = settingsCopy.getY();
+		double y = settingsCopy.getY();
 		for (int pY = 0;pY < image.getHeight() ; pY++, y+= deltaY) {
-			float x = settingsCopy.getX();
+			double x = settingsCopy.getX();
 			for (int pX=0;pX<image.getWidth();pX++,x+=deltaX) {
 				int iterations = calculateMandelbrotIterations(x,y);
 

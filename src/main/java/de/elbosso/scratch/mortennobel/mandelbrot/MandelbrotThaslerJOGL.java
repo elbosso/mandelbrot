@@ -1,3 +1,41 @@
+/*
+ * Copyright (c) 2019.
+ *
+ * Juergen Key. Alle Rechte vorbehalten.
+ *
+ * Weiterverbreitung und Verwendung in nichtkompilierter oder kompilierter Form,
+ * mit oder ohne Veraenderung, sind unter den folgenden Bedingungen zulaessig:
+ *
+ *    1. Weiterverbreitete nichtkompilierte Exemplare muessen das obige Copyright,
+ * die Liste der Bedingungen und den folgenden Haftungsausschluss im Quelltext
+ * enthalten.
+ *    2. Weiterverbreitete kompilierte Exemplare muessen das obige Copyright,
+ * die Liste der Bedingungen und den folgenden Haftungsausschluss in der
+ * Dokumentation und/oder anderen Materialien, die mit dem Exemplar verbreitet
+ * werden, enthalten.
+ *    3. Weder der Name des Autors noch die Namen der Beitragsleistenden
+ * duerfen zum Kennzeichnen oder Bewerben von Produkten, die von dieser Software
+ * abgeleitet wurden, ohne spezielle vorherige schriftliche Genehmigung verwendet
+ * werden.
+ *
+ * DIESE SOFTWARE WIRD VOM AUTOR UND DEN BEITRAGSLEISTENDEN OHNE
+ * JEGLICHE SPEZIELLE ODER IMPLIZIERTE GARANTIEN ZUR VERFUEGUNG GESTELLT, DIE
+ * UNTER ANDEREM EINSCHLIESSEN: DIE IMPLIZIERTE GARANTIE DER VERWENDBARKEIT DER
+ * SOFTWARE FUER EINEN BESTIMMTEN ZWECK. AUF KEINEN FALL IST DER AUTOR
+ * ODER DIE BEITRAGSLEISTENDEN FUER IRGENDWELCHE DIREKTEN, INDIREKTEN,
+ * ZUFAELLIGEN, SPEZIELLEN, BEISPIELHAFTEN ODER FOLGENDEN SCHAEDEN (UNTER ANDEREM
+ * VERSCHAFFEN VON ERSATZGUETERN ODER -DIENSTLEISTUNGEN; EINSCHRAENKUNG DER
+ * NUTZUNGSFAEHIGKEIT; VERLUST VON NUTZUNGSFAEHIGKEIT; DATEN; PROFIT ODER
+ * GESCHAEFTSUNTERBRECHUNG), WIE AUCH IMMER VERURSACHT UND UNTER WELCHER
+ * VERPFLICHTUNG AUCH IMMER, OB IN VERTRAG, STRIKTER VERPFLICHTUNG ODER
+ * UNERLAUBTE HANDLUNG (INKLUSIVE FAHRLAESSIGKEIT) VERANTWORTLICH, AUF WELCHEM
+ * WEG SIE AUCH IMMER DURCH DIE BENUTZUNG DIESER SOFTWARE ENTSTANDEN SIND, SOGAR,
+ * WENN SIE AUF DIE MOEGLICHKEIT EINES SOLCHEN SCHADENS HINGEWIESEN WORDEN SIND.
+ *
+ */
+
+//https://www.thasler.com/blog/blog/glsl-part2-emu
+
 package de.elbosso.scratch.mortennobel.mandelbrot;
 
 import com.jogamp.opengl.util.Animator;
@@ -14,7 +52,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import de.netsysit.util.ResourceLoader;
 
-public class MandelbrotJOGL extends GLCanvas implements GLEventListener, MandelbrotRender {
+public class MandelbrotThaslerJOGL extends GLCanvas implements GLEventListener, MandelbrotRender {
 	private boolean updateUniformVars = true;
 	private int vertexShaderProgram;
 	private int fragmentShaderProgram;
@@ -25,20 +63,21 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 	//new Animator(this);
 	private java.lang.Object monitor=new java.lang.Object();
 	private java.io.File f;
+	private float zoom=128;
 
 	private FPSStat fpsStat = new FPSStat();
-	
-	public MandelbrotJOGL(MandelbrotSetting settings) {
+
+	public MandelbrotThaslerJOGL(MandelbrotSetting settings) {
 		this.settings = settings;
 //		animator.setRunAsFastAsPossible(true);
 		addGLEventListener(this);
-    }
+	}
 
-    public void init(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
+	public void init(GLAutoDrawable drawable) {
+		GL2 gl = drawable.getGL().getGL2();
 
-        // Enable VSync
-        gl.setSwapInterval(1);
+		// Enable VSync
+		gl.setSwapInterval(1);
 		gl.glShadeModel(GL2.GL_FLAT);
 		try {
 			attachShaders(gl);
@@ -77,11 +116,11 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 		vertexShaderProgram = gl.glCreateShader(GL2.GL_VERTEX_SHADER);
 		fragmentShaderProgram = gl.glCreateShader(GL2.GL_FRAGMENT_SHADER);
 
-		String[] vsrc = loadShaderSrc("mandelbrot.vs");
+		String[] vsrc = loadShaderSrc("mandelbrotd2.vs");
 		gl.glShaderSource(vertexShaderProgram, 1, vsrc, null, 0);
 		gl.glCompileShader(vertexShaderProgram);
 
-		String[] fsrc = loadShaderSrc("mandelbrot.fs");
+		String[] fsrc = loadShaderSrc("mandelbrotd2.fs");
 		gl.glShaderSource(fragmentShaderProgram, 1, fsrc, null, 0);
 		gl.glCompileShader(fragmentShaderProgram);
 
@@ -112,21 +151,21 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 		GL2 gl = drawable.getGL().getGL2();
-        GLU glu = new GLU();
+		GLU glu = new GLU();
 
-        if (height <= 0) { // avoid a divide by zero error!
+		if (height <= 0) { // avoid a divide by zero error!
 
-            height = 1;
-        }
-        gl.glViewport(0, 0, width, height);
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-        glu.gluOrtho2D(0, 1, 0, 1);
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-    }
+			height = 1;
+		}
+		gl.glViewport(0, 0, width, height);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glLoadIdentity();
+		glu.gluOrtho2D(0, 1, 0, 1);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glLoadIdentity();
+	}
 
-    public void display(GLAutoDrawable drawable) {
+	public void display(GLAutoDrawable drawable) {
 		fpsStat.timerStart();
 		GL2 gl = drawable.getGL().getGL2();
 
@@ -137,8 +176,8 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 		// Reset the current matrix to the "identity"
 		gl.glLoadIdentity();
 
-        // Draw A Quad
-        gl.glBegin(GL2.GL_QUADS);
+		// Draw A Quad
+		gl.glBegin(GL2.GL_QUADS);
 		{
 			gl.glTexCoord2f(0.0f, 0.0f);
 			gl.glVertex3f(0.0f, 1.0f, 1.0f);
@@ -150,17 +189,17 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 			gl.glVertex3f(0.0f, 0.0f, 1.0f);
 		}
 		// Done Drawing The Quad
-        gl.glEnd();
+		gl.glEnd();
 
-        // Flush all drawing operations to the graphics card
-        gl.glFlush();
+		// Flush all drawing operations to the graphics card
+		gl.glFlush();
 
-        java.io.File file=null;
-        synchronized (monitor)
+		java.io.File file=null;
+		synchronized (monitor)
 		{
 			file = f;
 		}
-        if(file!=null)
+		if(file!=null)
 		{
 			java.awt.image.BufferedImage bimg=new java.awt.image.BufferedImage(getComponent().getWidth(),getComponent().getHeight(), java.awt.image.BufferedImage.TYPE_INT_ARGB);
 			java.awt.Graphics g=bimg.getGraphics();
@@ -201,10 +240,10 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 			g.dispose();
 		}
 		fpsStat.timerEnd();
-    }
+	}
 
 	private void updateUniformVars(GL2 gl) {
-        // get memory address of uniform shader variables
+		// get memory address of uniform shader variables
 		int mandel_x = gl.glGetUniformLocation(shaderprogram, "mandel_x");
 		int mandel_y = gl.glGetUniformLocation(shaderprogram, "mandel_y");
 		int mandel_width = gl.glGetUniformLocation(shaderprogram, "mandel_width");
@@ -215,17 +254,17 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 		assert(mandel_width!=-1);
 		assert(mandel_height!=-1);
 		assert(mandel_iterations!=-1);
-        // set uniform shader variables
-		gl.glUniform1f(mandel_x, settings.getXAsFloat());
-		gl.glUniform1f(mandel_y, settings.getYAsFloat());
-		gl.glUniform1f(mandel_width, settings.getWidthAsFloat());
-		gl.glUniform1f(mandel_height, settings.getHeightAsFloat());
+		// set uniform shader variables
+		gl.glUniform2f(mandel_x, settings.getXAsFloat(),(float)(settings.getX()-(double)settings.getXAsFloat()));
+		gl.glUniform2f(mandel_y, settings.getYAsFloat(),(float)(settings.getY()-(double)settings.getYAsFloat()));
+		gl.glUniform2f(mandel_width, settings.getWidthAsFloat(),(float)(settings.getWidth()-(double)settings.getWidthAsFloat()));
+		gl.glUniform2f(mandel_height, settings.getHeightAsFloat(),(float)(settings.getHeight()-(double)settings.getHeightAsFloat()));
 		gl.glUniform1f(mandel_iterations, settings.getIterations());
 
 	}
 
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
-    }
+	}
 
 	public void pauseAnimation() {
 		animator.stop();

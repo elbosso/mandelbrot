@@ -14,55 +14,44 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	,java.awt.event.MouseWheelListener
 	,java.awt.event.MouseListener
 {
-	static
-{
-		try
-		{
-			java.util.Properties iconFallbacks = new java.util.Properties();
-			iconFallbacks.setProperty("de/netsysit/ressources/gfx/ca/screenshot_48.png", "image/drawable-mdpi/ic_photo_camera_black_48dp.png");
-			iconFallbacks.setProperty("de/netsysit/ressources/gfx/common/Reset24.gif", "navigation/drawable-mdpi/ic_refresh_black_48dp.png");
-			iconFallbacks.setProperty("toolbarButtonGraphics/media/Play24.gif", "av/drawable-mdpi/ic_play_arrow_black_48dp.png");
-			iconFallbacks.setProperty("toolbarButtonGraphics/media/Stop24.gif", "av/drawable-mdpi/ic_stop_black_48dp.png");
-			de.netsysit.util.ResourceLoader.configure(iconFallbacks);
-		}
-		catch(java.io.IOException ioexp)
-		{
-			ioexp.printStackTrace();
-		}
-}
-
-
+	//interesting points:
+	//0.42483058528569073;-0.2134979507302626
 	private final static String[] EXPORTSUFFIXES =javax.imageio.ImageIO.getWriterFileSuffixes();
 
 	private MandelbrotAnimation anim;
 	private JPanel subPanel = new JPanel(new GridLayout(0,1));
 	private JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 	private JRadioButton java2dCheckbox = new JRadioButton("Java2D",true);
-	private JRadioButton joglCheckbox = new JRadioButton("JOGL",false);
-	private JComboBox iterations = new JComboBox(new Object[]{32,64,128,256,512,1024,2048,4096});
+	private JRadioButton joglCheckbox = new JRadioButton("JOGL single",false);
+	private JRadioButton joglThaslerCheckbox = new JRadioButton("JOGL double",false);
+	private JComboBox iterations = new JComboBox(new Object[]{32,64,128,256,512,1024,2048,4096,10000, 20000});
 	private JComboBox movementSpeed = new JComboBox(new Object[]{2,4,6,8,10,15,20});
 
 	private ButtonGroup buttonGroup = new ButtonGroup();
 	private JLabel fpsLabel = new JLabel("");
 
-	private MandelbrotJava2D mandelbrotJava2D;
-	private MandelbrotJOGL mandelbrotJOGL;
+	private MandelbrotJava2DThreaded mandelbrotJava2D;
+	private MandelbrotJOGL mandelbrotJOGL;//3.073639559620469E-5
+	private MandelbrotThaslerJOGL mandelbrotThaslerJOGL;//0.296909197039668
 	private MandelbrotRender currentRendere;
 	private javax.swing.JPanel topLevel;
 	private javax.swing.Action resetAction;
 	private javax.swing.Action snapshotPngAction;
 	private de.elbosso.util.pattern.command.StartStopActionPair startStopActionPair;
 	private de.netsysit.util.threads.CubbyHole ch;
-	private float zoom=1.0f;
-	private float centerX;
-	private float centerY;
+	private double zoom=1.0f;
+	private double centerX;
+	private double centerY;
 
 	public Mandelbrot() {
 		super();
 		ch=new de.elbosso.util.threads.StopAndGoCubbyHole();
 		anim = new MandelbrotAnimation(this,ch);
-		mandelbrotJava2D = new MandelbrotJava2D(anim.getSetting());
+		centerX=anim.getSetting().getX();
+		centerY=anim.getSetting().getY();
+		mandelbrotJava2D = new MandelbrotJava2DThreaded(anim.getSetting());
 		mandelbrotJOGL = new MandelbrotJOGL(anim.getSetting());
+		mandelbrotThaslerJOGL = new MandelbrotThaslerJOGL(anim.getSetting());
 		setSize(800,800);
 		topLevel=new javax.swing.JPanel(new BorderLayout());
 		setContentPane(topLevel);
@@ -81,11 +70,13 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		topLevel.add(tb, BorderLayout.NORTH);
 		buttonGroup.add(java2dCheckbox);
 		buttonGroup.add(joglCheckbox);
+		buttonGroup.add(joglThaslerCheckbox);
 		subPanel.add(fpsLabel);
 		fpsLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		controlPanel.add(new JLabel("Render"));
 		controlPanel.add(java2dCheckbox);
 		controlPanel.add(joglCheckbox);
+		controlPanel.add(joglThaslerCheckbox);
 		controlPanel.add(new JLabel("# Iterations"));
 		controlPanel.add(iterations);
 		iterations.setSelectedItem(anim.getSetting().getIterations());
@@ -95,6 +86,7 @@ public class Mandelbrot extends JFrame implements ChangeListener
 				anim.getSetting().setIterations(iter);
 				mandelbrotJava2D.getStats().clear();
 				mandelbrotJOGL.getStats().clear();
+				mandelbrotThaslerJOGL.getStats().clear();
 			}
 		});
 		controlPanel.add(new JLabel("Movement speed"));
@@ -114,6 +106,8 @@ public class Mandelbrot extends JFrame implements ChangeListener
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource()==joglCheckbox){
 					setRenderPanel(mandelbrotJOGL);
+				} else if (e.getSource()==joglThaslerCheckbox){
+					setRenderPanel(mandelbrotThaslerJOGL);
 				} else {
 					setRenderPanel(mandelbrotJava2D);
 				}
@@ -121,6 +115,7 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		};
 
 		joglCheckbox.addActionListener(al);
+		joglThaslerCheckbox.addActionListener(al);
 		java2dCheckbox.addActionListener(al);
 		anim.start();
 		setVisible(true);
@@ -140,7 +135,6 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	private void createActions()
 	{
 		resetAction=new de.netsysit.util.pattern.command.ResetAction(this);
-		resetAction.putValue(Action.SHORT_DESCRIPTION,"Reset");
 		startStopActionPair=new de.elbosso.util.pattern.command.StartStopActionPair(anim);
 		de.netsysit.util.pattern.command.FileProcessor exportImgClient =
 				new de.netsysit.util.pattern.command.FileProcessor()
@@ -159,16 +153,12 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		{
 			img = new de.netsysit.util.pattern.command.ChooseFileAction(exportImgClient, /*i18n.getString("ImageViewer.*/"snapshotPngAction"/*.text")*/, null);
 		}
-		startStopActionPair.getStopAction().putValue(Action.SHORT_DESCRIPTION,"Stop animation");
-		startStopActionPair.getStartAction().putValue(Action.SHORT_DESCRIPTION,"Start animation");
-
 //					de.netsysit.db.ui.Utilities.configureOpenFileChooser(img.getFilechooser());
 		img.setAllowedSuffixes(EXPORTSUFFIXES);
 		img.setSaveDialog(true);
 		img.setDefaultFileEnding(".png");
 //		img.putValue(javax.swing.Action.SHORT_DESCRIPTION, i18n.getString("ImageViewer.snapshotPngAction.tooltip"));
 		snapshotPngAction = img;
-		snapshotPngAction.putValue(Action.SHORT_DESCRIPTION,"Screenshot (as PNG)");
 	}
 	private void setRenderPanel(MandelbrotRender newRendere){
 		assert(newRendere!=null);
@@ -256,13 +246,13 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		if(anim.isRunning()==false)
 		{
 			if(e.getWheelRotation()<0)
-				zoom *= 0.95f;
+				zoom *= 0.95;
 			else
-				zoom /= 0.95f;
-			float smallestsize = zoom * MandelbrotAnimation.ZOOM_FACTOR;
-			float width = (float) (currentRendere.getComponent().getSize() != null ? currentRendere.getComponent().getSize().width : 800);
-			float height = (float) (currentRendere.getComponent().getSize() != null ? currentRendere.getComponent().getSize().height : 800);
-			float fac = width / height;
+				zoom /= 0.95;
+			double smallestsize = zoom * MandelbrotAnimation.ZOOM_FACTOR;
+			double width = (float) (currentRendere.getComponent().getSize() != null ? currentRendere.getComponent().getSize().width : 800);
+			double height = (float) (currentRendere.getComponent().getSize() != null ? currentRendere.getComponent().getSize().height : 800);
+			double fac = width / height;
 			if (fac < 1)
 			{
 				anim.getSetting().setHeight(smallestsize / fac);
@@ -273,8 +263,8 @@ public class Mandelbrot extends JFrame implements ChangeListener
 				anim.getSetting().setHeight(smallestsize);
 				anim.getSetting().setWidth(smallestsize * fac);
 			}
-			anim.getSetting().setX(centerX-anim.getSetting().getWidth()*0.5f);
-			anim.getSetting().setY(centerY-anim.getSetting().getHeight()*0.5f);
+			anim.getSetting().setX(centerX-anim.getSetting().getWidth()*0.5);
+			anim.getSetting().setY(centerY-anim.getSetting().getHeight()*0.5);
 			stateChanged(null);
 		}
 	}
@@ -284,14 +274,15 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	{
 		if(anim.isRunning()==false)
 		{
-			float x=anim.getSetting().getX();
-			float fac=(float)e.getX()/(float)e.getComponent().getSize().width;
+			double x=anim.getSetting().getX();
+			double fac=(double)e.getX()/(double)e.getComponent().getSize().width;
 			centerX=x+anim.getSetting().getWidth()*fac;
-			float y=anim.getSetting().getY();
+			double y=anim.getSetting().getY();
 			fac=(float)e.getY()/(float)e.getComponent().getSize().height;
 			centerY=y+anim.getSetting().getHeight()*fac;
 			anim.getSetting().setX(centerX-anim.getSetting().getWidth()*0.5f);
 			anim.getSetting().setY(centerY-anim.getSetting().getHeight()*0.5f);
+			System.out.println(""+anim.getSetting().getX()+";"+anim.getSetting().getY());
 			stateChanged(null);
 		}
 	}

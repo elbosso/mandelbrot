@@ -96,9 +96,9 @@ public class MandelbrotJava2DThreaded extends JComponent implements MandelbrotRe
         // optimized - caching xx*xx and yy*yy
 		double xxXxCache;
 		double yyYyCache;
-        while ((xxXxCache=xx * xx) + (yyYyCache=yy * yy) <= 4.0f && iter<settingsCopy.getIterations()) {
+        while ((xxXxCache=xx * xx) + (yyYyCache=yy * yy) <= DEFININGRADIUSSQUARED && iter<settingsCopy.getIterations()) {
 			double temp = xxXxCache - yyYyCache + x;
-			yy = 2.0f*xx*yy + y;
+			yy = DEFININGRADIUS*xx*yy + y;
 
 			xx = temp;
 

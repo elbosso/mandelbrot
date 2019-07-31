@@ -7,6 +7,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 public class Mandelbrot extends JFrame implements ChangeListener
 ,java.awt.event.ComponentListener
@@ -22,17 +23,27 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	private JPanel subPanel = new JPanel(new GridLayout(0,1));
 	private JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 	private JRadioButton java2dCheckbox = new JRadioButton("Java2D",true);
+	private JRadioButton juliajava2dCheckbox = new JRadioButton("Julia Java2D",true);
+	private JRadioButton juliajava2dThreadedCheckbox = new JRadioButton("Julia Java2D Threaded",true);
+	private JRadioButton java2dThreadedCheckbox = new JRadioButton("Java2D Threaded",true);
 	private JRadioButton joglCheckbox = new JRadioButton("JOGL single",false);
 	private JRadioButton joglThaslerCheckbox = new JRadioButton("JOGL double",false);
+	private JRadioButton juliaJoglCheckbox = new JRadioButton("Julia JOGL single",false);
+	private JRadioButton juliaJoglDoubleCheckbox = new JRadioButton("Julia JOGL double",false);
 	private JComboBox iterations = new JComboBox(new Object[]{32,64,128,256,512,1024,2048,4096,10000, 20000});
 	private JComboBox movementSpeed = new JComboBox(new Object[]{2,4,6,8,10,15,20});
 
 	private ButtonGroup buttonGroup = new ButtonGroup();
 	private JLabel fpsLabel = new JLabel("");
 
-	private MandelbrotJava2DThreaded mandelbrotJava2D;
+	private MandelbrotJava2D mandelbrotJava2D;
+	private MandelbrotJava2DThreaded mandelbrotJava2DThreaded;
+	private JuliaJava2D juliaJava2D;
+	private JuliaJava2DThreaded juliaJava2DThreaded;
 	private MandelbrotJOGL mandelbrotJOGL;//3.073639559620469E-5
 	private MandelbrotThaslerJOGL mandelbrotThaslerJOGL;//0.296909197039668
+	private JuliaJOGL juliaJOGL;//3.073639559620469E-5
+	private JuliaDoubleJOGL juliaDoubleJOGL;//3.073639559620469E-5
 	private MandelbrotRender currentRendere;
 	private javax.swing.JPanel topLevel;
 	private javax.swing.Action resetAction;
@@ -43,19 +54,35 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	private double centerX;
 	private double centerY;
 
-	public Mandelbrot() {
+	public Mandelbrot() throws IOException
+	{
 		super();
+
+		java.util.Properties iconFallbacks = new java.util.Properties();
+		iconFallbacks.setProperty("de/netsysit/ressources/gfx/common/Reset24.gif", "av/drawable-mdpi/ic_replay_black_48dp.png");
+		iconFallbacks.setProperty("toolbarButtonGraphics/media/Play24.gif", "av/drawable-mdpi/ic_play_arrow_black_48dp.png");
+		iconFallbacks.setProperty("toolbarButtonGraphics/media/Stop24.gif", "av/drawable-mdpi/ic_stop_black_48dp.png");
+//		iconFallbacks.setProperty("de/netsysit/ressources/gfx/common/Reset24.gif", "av/drawable-mdpi/ic_replay_black_48dp.png");
+		de.netsysit.util.ResourceLoader.configure(iconFallbacks);
+
+		System.out.println("available Threads for multithreading: "+(Runtime.getRuntime().availableProcessors()+1));
 		ch=new de.elbosso.util.threads.StopAndGoCubbyHole();
 		anim = new MandelbrotAnimation(this,ch);
 		centerX=anim.getSetting().getX();
 		centerY=anim.getSetting().getY();
-		mandelbrotJava2D = new MandelbrotJava2DThreaded(anim.getSetting());
+		mandelbrotJava2D = new MandelbrotJava2D(anim.getSetting());
+		mandelbrotJava2DThreaded = new MandelbrotJava2DThreaded(anim.getSetting());
 		mandelbrotJOGL = new MandelbrotJOGL(anim.getSetting());
 		mandelbrotThaslerJOGL = new MandelbrotThaslerJOGL(anim.getSetting());
+		juliaJava2D = new JuliaJava2D(anim.getSetting());
+		juliaJava2DThreaded = new JuliaJava2DThreaded(anim.getSetting());
+		juliaJOGL = new JuliaJOGL(anim.getSetting());
+		juliaDoubleJOGL = new JuliaDoubleJOGL(anim.getSetting());
+
 		setSize(800,800);
 		topLevel=new javax.swing.JPanel(new BorderLayout());
 		setContentPane(topLevel);
-		setRenderPanel(mandelbrotJava2D);
+		setRenderPanel(juliaJava2D);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		createActions();
 		topLevel.add(subPanel, BorderLayout.SOUTH);
@@ -69,14 +96,25 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		tb.add(snapshotPngAction);
 		topLevel.add(tb, BorderLayout.NORTH);
 		buttonGroup.add(java2dCheckbox);
+		buttonGroup.add(java2dThreadedCheckbox);
+		buttonGroup.add(juliajava2dCheckbox);
+		buttonGroup.add(juliajava2dThreadedCheckbox);
 		buttonGroup.add(joglCheckbox);
 		buttonGroup.add(joglThaslerCheckbox);
+		buttonGroup.add(juliaJoglCheckbox);
+		buttonGroup.add(juliaJoglDoubleCheckbox);
 		subPanel.add(fpsLabel);
 		fpsLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		controlPanel.add(new JLabel("Render"));
 		controlPanel.add(java2dCheckbox);
+		controlPanel.add(java2dThreadedCheckbox);
+		controlPanel.add(juliajava2dCheckbox);
+		controlPanel.add(juliajava2dThreadedCheckbox);
 		controlPanel.add(joglCheckbox);
 		controlPanel.add(joglThaslerCheckbox);
+		controlPanel.add(juliaJoglCheckbox);
+		controlPanel.add(juliaJoglDoubleCheckbox);
+		juliajava2dCheckbox.setSelected(true);
 		controlPanel.add(new JLabel("# Iterations"));
 		controlPanel.add(iterations);
 		iterations.setSelectedItem(anim.getSetting().getIterations());
@@ -87,6 +125,12 @@ public class Mandelbrot extends JFrame implements ChangeListener
 				mandelbrotJava2D.getStats().clear();
 				mandelbrotJOGL.getStats().clear();
 				mandelbrotThaslerJOGL.getStats().clear();
+				mandelbrotJava2DThreaded.getStats().clear();
+				juliaJava2D.getStats().clear();
+				juliaJava2DThreaded.getStats().clear();
+				juliaJOGL.getStats().clear();
+				juliaDoubleJOGL.getStats().clear();
+				stateChanged(null);
 			}
 		});
 		controlPanel.add(new JLabel("Movement speed"));
@@ -104,10 +148,20 @@ public class Mandelbrot extends JFrame implements ChangeListener
 
 		ActionListener al = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (e.getSource()==joglCheckbox){
+				if (joglCheckbox.isSelected()){
 					setRenderPanel(mandelbrotJOGL);
-				} else if (e.getSource()==joglThaslerCheckbox){
+				} else if (joglThaslerCheckbox.isSelected()){
 					setRenderPanel(mandelbrotThaslerJOGL);
+				} else if (java2dThreadedCheckbox.isSelected()){
+					setRenderPanel(mandelbrotJava2DThreaded);
+				} else if (juliajava2dCheckbox.isSelected()){
+					setRenderPanel(juliaJava2D);
+				} else if (juliajava2dThreadedCheckbox.isSelected()){
+					setRenderPanel(juliaJava2DThreaded);
+				} else if (juliaJoglCheckbox.isSelected()){
+					setRenderPanel(juliaJOGL);
+				} else if (juliaJoglDoubleCheckbox.isSelected()){
+					setRenderPanel(juliaDoubleJOGL);
 				} else {
 					setRenderPanel(mandelbrotJava2D);
 				}
@@ -117,6 +171,11 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		joglCheckbox.addActionListener(al);
 		joglThaslerCheckbox.addActionListener(al);
 		java2dCheckbox.addActionListener(al);
+		java2dThreadedCheckbox.addActionListener(al);
+		juliajava2dCheckbox.addActionListener(al);
+		juliajava2dThreadedCheckbox.addActionListener(al);
+		juliaJoglCheckbox.addActionListener(al);
+		juliaJoglDoubleCheckbox.addActionListener(al);
 		anim.start();
 		setVisible(true);
 	}
@@ -151,7 +210,7 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		}
 		else
 		{
-			img = new de.netsysit.util.pattern.command.ChooseFileAction(exportImgClient, /*i18n.getString("ImageViewer.*/"snapshotPngAction"/*.text")*/, null);
+			img = new de.netsysit.util.pattern.command.ChooseFileAction(exportImgClient, /*i18n.getString("ImageViewer.*/"snapshotPngAction"/*.text")*/, new javax.swing.ImageIcon(de.netsysit.util.ResourceLoader.getImgResource("image/drawable-mdpi/ic_camera_alt_black_48dp.png")));
 		}
 //					de.netsysit.db.ui.Utilities.configureOpenFileChooser(img.getFilechooser());
 		img.setAllowedSuffixes(EXPORTSUFFIXES);
@@ -188,7 +247,13 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				new Mandelbrot();
+				try
+				{
+					new Mandelbrot();
+				} catch (IOException e)
+				{
+					de.elbosso.util.Utilities.handleException(null,e);
+				}
 			}
 		});
 	}
@@ -203,7 +268,7 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	}
 
 	public void stateChanged(ChangeEvent e) {
-		if (currentRendere==mandelbrotJava2D){
+		if (((currentRendere==mandelbrotJava2D)||(currentRendere==juliaJava2DThreaded))||((currentRendere==mandelbrotJava2DThreaded)||(currentRendere==juliaJava2D))){
 			repaint();
 		}
 		updateFps();
@@ -243,6 +308,7 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
+//		System.out.println("mouseWheelMoved "+anim.isRunning());
 		if(anim.isRunning()==false)
 		{
 			if(e.getWheelRotation()<0)

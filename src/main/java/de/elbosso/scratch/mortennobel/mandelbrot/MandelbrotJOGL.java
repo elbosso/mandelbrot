@@ -58,7 +58,7 @@ public class MandelbrotJOGL extends GLCanvas implements GLEventListener, Mandelb
 	private String[] loadShaderSrc(String name){
 		StringBuilder sb = new StringBuilder();
 		try{
-			InputStream is = ResourceLoader.getResource("de/elbosso/scratch/data/mortennobel/mandelbrot/"+name).openStream();
+			InputStream is = ResourceLoader.getResource("mortennobel/mandelbrot/"+name).openStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			String line;
 			while ((line = br.readLine())!=null){

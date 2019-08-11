@@ -6,6 +6,9 @@ public class MandelbrotSetting {
 	private double height = 0.3;//4;
 	private double width = 0.3;//4;
 	private int iterations = 128;
+	private double reC=-0.6;
+	private double imC=0.6;
+
 
 	public double getX() {
 		return x;
@@ -62,11 +65,37 @@ public class MandelbrotSetting {
 		this.iterations = iterations;
 	}
 
+	public double getImC() {
+		return imC;
+	}
+
+	public float getImCAsFloat() {
+		return (float)imC;
+	}
+
+	public void setImC(double imC) {
+		this.imC = imC;
+	}
+
+	public double getReC() {
+		return reC;
+	}
+
+	public float getReCAsFloat() {
+		return (float)reC;
+	}
+
+	public void setReC(double reC) {
+		this.reC = reC;
+	}
+
 	public void copyTo(MandelbrotSetting copy) {
 		copy.x = x;
 		copy.y = y;
 		copy.height = height;
 		copy.width = width;
 		copy.iterations = iterations;
+		copy.imC=imC;
+		copy.reC=reC;
 	}
 }

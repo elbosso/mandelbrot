@@ -3,6 +3,8 @@ package de.elbosso.scratch.mortennobel.mandelbrot;
 import java.awt.*;
 
 public interface MandelbrotRender {
+	final static double DEFININGRADIUS=2.0;
+	final static double DEFININGRADIUSSQUARED=DEFININGRADIUS*DEFININGRADIUS;
 	/**
 	 * Only used for AWT
 	 */

@@ -24,7 +24,8 @@ public class FPSStat {
 	public void timerEnd(){
 		// find delta time and convert to millis
 		usedTimeMillis = (System.nanoTime()-nanoTimeStart)/1000000L;
-		lastTimeInMillis=usedTimeMillis-priorusedTimeMillis;
+		if(usedTimeMillis!=priorusedTimeMillis)
+			lastTimeInMillis=usedTimeMillis-priorusedTimeMillis;
 		priorusedTimeMillis=usedTimeMillis;
 		if (usedTimeMillis==0){
 			return;

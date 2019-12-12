@@ -21,6 +21,14 @@ Changelog of Git Changelog Maven plugin.
 [b1fe94172831075](https://github.com/elbosso/mandelbrot/commit/b1fe94172831075) Juergen Key *2019-07-31 17:13:36*
 
 
+### No issue
+
+**added changelog**
+
+
+[c7c32fd50973e0f](https://github.com/elbosso/mandelbrot/commit/c7c32fd50973e0f) Juergen Key *2019-08-25 12:47:36*
+
+
 ## refs/tags/1.1
 ### GitHub [#1](https://github.com/elbosso/mandelbrot/issues/1) add double precision in shader mode and threaded native java mode
 

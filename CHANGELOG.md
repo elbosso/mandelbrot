@@ -21,7 +21,28 @@ Changelog of Git Changelog Maven plugin.
 [b1fe94172831075](https://github.com/elbosso/mandelbrot/commit/b1fe94172831075) Juergen Key *2019-07-31 17:13:36*
 
 
+### GitHub [#3](https://github.com/elbosso/mandelbrot/issues/3) add an arbitrary precision mode 
+
+**rollback of changes for invalid issues #3 and #4**
+
+
+[4070fcd2089dd8d](https://github.com/elbosso/mandelbrot/commit/4070fcd2089dd8d) Juergen Key *2019-12-12 15:56:25*
+
+
+### GitHub [#4](https://github.com/elbosso/mandelbrot/issues/4) try to double the precision like in shader mode from float to double in java native mode from double to DoubleDouble
+
+**rollback of changes for invalid issues #3 and #4**
+
+
+[4070fcd2089dd8d](https://github.com/elbosso/mandelbrot/commit/4070fcd2089dd8d) Juergen Key *2019-12-12 15:56:25*
+
+
 ### No issue
+
+**maven central completely blocks http now**
+
+
+[034ef4cf54d9b7f](https://github.com/elbosso/mandelbrot/commit/034ef4cf54d9b7f) Jürgen Key *2020-01-24 17:37:48*
 
 **added changelog**
 

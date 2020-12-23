@@ -39,6 +39,11 @@ Changelog of Git Changelog Maven plugin.
 
 ### No issue
 
+**dependencies corrected**
+
+
+[7f9909561f68df1](https://github.com/elbosso/mandelbrot/commit/7f9909561f68df1) Juergen Key *2020-07-17 12:36:02*
+
 **maven central completely blocks http now**
 
 

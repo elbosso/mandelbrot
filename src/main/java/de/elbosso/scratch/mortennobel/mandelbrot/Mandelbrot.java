@@ -58,13 +58,6 @@ public class Mandelbrot extends JFrame implements ChangeListener
 	{
 		super();
 
-		java.util.Properties iconFallbacks = new java.util.Properties();
-		iconFallbacks.setProperty("de/netsysit/ressources/gfx/common/Reset24.gif", "av/drawable-mdpi/ic_replay_black_48dp.png");
-		iconFallbacks.setProperty("toolbarButtonGraphics/media/Play24.gif", "av/drawable-mdpi/ic_play_arrow_black_48dp.png");
-		iconFallbacks.setProperty("toolbarButtonGraphics/media/Stop24.gif", "av/drawable-mdpi/ic_stop_black_48dp.png");
-//		iconFallbacks.setProperty("de/netsysit/ressources/gfx/common/Reset24.gif", "av/drawable-mdpi/ic_replay_black_48dp.png");
-		de.netsysit.util.ResourceLoader.configure(iconFallbacks);
-
 		System.out.println("available Threads for multithreading: "+(Runtime.getRuntime().availableProcessors()+1));
 		ch=new de.elbosso.util.threads.StopAndGoCubbyHole();
 		anim = new MandelbrotAnimation(this,ch);
@@ -244,7 +237,30 @@ public class Mandelbrot extends JFrame implements ChangeListener
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws java.io.IOException{
+		try
+		{
+			java.util.Properties iconFallbacks = new java.util.Properties();
+			java.io.InputStream is=de.netsysit.util.ResourceLoader.getResource("de/elbosso/ressources/data/icon_trans_material.properties").openStream();
+			iconFallbacks.load(is);
+			is.close();
+			de.netsysit.util.ResourceLoader.configure(iconFallbacks);
+		}
+		catch(java.io.IOException ioexp)
+		{
+			ioexp.printStackTrace();
+		}
+
+		de.netsysit.util.ResourceLoader.setSize(de.netsysit.util.ResourceLoader.IconSize.small);
+
+		java.util.Properties iconFallbacks = new java.util.Properties();
+//		iconFallbacks.setProperty("de/netsysit/ressources/gfx/common/Reset24.gif", "av/drawable-mdpi/ic_replay_black_48dp.png");
+//		iconFallbacks.setProperty("toolbarButtonGraphics/media/Play24.gif", "av/drawable-mdpi/ic_play_arrow_black_48dp.png");
+//		iconFallbacks.setProperty("toolbarButtonGraphics/media/Stop24.gif", "av/drawable-mdpi/ic_stop_black_48dp.png");
+//		iconFallbacks.setProperty("de/netsysit/ressources/gfx/common/Reset24.gif", "av/drawable-mdpi/ic_replay_black_48dp.png");
+		de.netsysit.util.ResourceLoader.configure(iconFallbacks);
+
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try

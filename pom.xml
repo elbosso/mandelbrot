@@ -184,13 +184,13 @@ WENN SIE AUF DIE MOEGLICHKEIT EINES SOLCHEN SCHADENS HINGEWIESEN WORDEN SIND.
         <dependency>
             <groupId>de.elbosso</groupId>
             <artifactId>data</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>de.elbosso</groupId>
             <artifactId>custommaterialgfx</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

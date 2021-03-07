@@ -2,7 +2,7 @@
 
 Changelog of Git Changelog Maven plugin.
 
-## Unreleased
+## 1.0.0
 ### GitHub [#2](https://github.com/elbosso/mandelbrot/issues/2) add computation of julia sets (shader and native java modes)
 
 **re #2 (resource path was wrong for shader program files)**
@@ -38,6 +38,16 @@ Changelog of Git Changelog Maven plugin.
 
 
 ### No issue
+
+**automated maven release management**
+
+
+[c0e0758411da8ec](https://github.com/elbosso/mandelbrot/commit/c0e0758411da8ec) Juergen Key *2020-12-23 10:04:54*
+
+**automated maven release management**
+
+
+[edf552b82551766](https://github.com/elbosso/mandelbrot/commit/edf552b82551766) Juergen Key *2020-12-23 10:04:07*
 
 **dependencies corrected**
 

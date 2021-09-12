@@ -2,6 +2,15 @@
 
 Changelog of Git Changelog Maven plugin.
 
+## Unreleased
+### No issue
+
+**repository locations fixed**
+
+
+[b31132bcbb89ea6](https://github.com/elbosso/mandelbrot/commit/b31132bcbb89ea6) Juergen Key *2021-03-07 07:28:42*
+
+
 ## 1.0.0
 ### GitHub [#2](https://github.com/elbosso/mandelbrot/issues/2) add computation of julia sets (shader and native java modes)
 

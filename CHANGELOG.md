@@ -3,6 +3,14 @@
 Changelog of Git Changelog Maven plugin.
 
 ## Unreleased
+### GitHub [#6](https://github.com/elbosso/mandelbrot/issues/6) get rid of log4j and use the new bom dependency
+
+**re #6**
+
+
+[b201e45e5de80a7](https://github.com/elbosso/mandelbrot/commit/b201e45e5de80a7) Juergen Key *2022-04-26 16:56:23*
+
+
 ### No issue
 
 **change of repository location for de.elbosso artifacts**

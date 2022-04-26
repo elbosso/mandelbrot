@@ -5,6 +5,11 @@ Changelog of Git Changelog Maven plugin.
 ## Unreleased
 ### No issue
 
+**change of repository location for de.elbosso artifacts**
+
+
+[604f3a03c8f4189](https://github.com/elbosso/mandelbrot/commit/604f3a03c8f4189) Juergen Key *2021-09-12 15:32:17*
+
 **repository locations fixed**
 
 
